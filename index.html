@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<link rel="icon" href="icon.png">
 <head>
   <meta charset="UTF-8">
   <title>ben.pet</title>
@@ -8,18 +9,33 @@
       background-color: #000000;
       color: #FFFFFF;
       font-family: "Inter", sans-serif;
+      font-size: 15pt;
     }
     .title {
       position: absolute;
-      top: 0;
-      left: 50px;
-      font-size: 50pt;
+      font-size: 15pt;
+      top: 0.1em;
+      left: 0.8em;
+    }
+    .links {
+	    color: white;
+      text-decoration: none;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: calc(100vh - 1em);
     }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap" rel="stylesheet">
-  <link rel="icon" href="icon.png">
 </head>
 <body>
-  <h1 class="title">ben.pet&reg;</h1>
+  <h1 class="title">BEN.PET&copy;</h1>
+  <div class="container">
+    <a class="links" href="tweets.html">TWEETS</a>
+    <a class="links" href="reddit.html">REDDIT</a>
+  </div>
 </body>
 </html>
