@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="icon.png">
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta charset="UTF-8">
+    <title>ben.pet</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            font-family: "Inter", sans-serif;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            font-size: 15pt;
+        }
+        .title {
+            position: absolute;
+            top: 0.1em;
+            left: 0.8em;
+            font-size: 15pt;
+        }
+        .controlButton {
+            font-size: 15pt;
+            cursor: pointer;
+        }
+        #minutes, #seconds {
+            font-size: 50pt;
+        }
+        #minutes:focus, #seconds:focus {
+            outline: none;
+            caret-color: transparent;
+            opacity: 50%;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 1em);
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        ::selection {
+            background: transparent;
+        }
+        .home:link {
+            text-decoration: none;
+        }
+        .home {
+            color: white;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1 class="title"><a class="home" href="index.html">BEN.PET&copy;</a></h1>
+    <div class="container">
+        <h1 class="time">
+            <span id="minutes" contenteditable="true">00</span>
+            <span id="seconds" contenteditable="true">00</span>
+        </h1>
+        <h1 id="controlButton" class="controlButton">START</h1> <!-- Control Button -->
+    </div>
+    <!-- Audio element for timer completion sound -->
+    <audio id="timerSound" src="finished.wav" preload="auto"></audio>
+    <script>
+        let countdown;
+        let timeRemaining = 0; // Initialize time remaining
+        let isPaused = false; // Flag for pause state
+        const minutes = document.getElementById("minutes");
+        const seconds = document.getElementById("seconds");
+        const controlButton = document.getElementById("controlButton"); // Control button reference
+
+        // Function to update timeRemaining based on input
+        function updateTimeRemaining() {
+            const minInput = Math.min(Math.max(Number(minutes.innerText), 0), 99); // Limit minutes to 0-99
+            const secInput = Math.min(Math.max(Number(seconds.innerText), 0), 59); // Limit seconds to 0-59
+            timeRemaining = (minInput * 60) + secInput;
+        }
+
+        function resetButton() {
+            controlButton.innerText = 'START'; // Reset button text to START
+            clearInterval(countdown); // Clear countdown if running
+            countdown = null; // Reset countdown reference
+            isPaused = false; // Reset pause state
+        }
+
+        minutes.addEventListener("input", function() {
+            // Ensure input is valid and update time
+            minutes.innerText = minutes.innerText.replace(/\D/g, '00');
+            if (minutes.innerText.length > 2) {
+                minutes.innerText = minutes.innerText.slice(0, 2);
+            } else if (minutes.innerText === '') {
+                minutes.innerText = '00';
+            } else if (minutes.innerText.length === 1) {
+                minutes.innerText = '0' + minutes.innerText;
+            }
+            updateTimeRemaining();
+            resetButton(); // Reset button to START when input changes
+        });
+
+        seconds.addEventListener("input", function() {
+            // Ensure input is valid and update time
+            seconds.innerText = seconds.innerText.replace(/\D/g, '00');
+            if (seconds.innerText.length > 2) {
+                seconds.innerText = seconds.innerText.slice(0, 2);
+            } else if (seconds.innerText === '') {
+                seconds.innerText = '00';
+            } else if (seconds.innerText.length === 1) {
+                seconds.innerText = '0' + seconds.innerText;
+            }
+            updateTimeRemaining();
+            resetButton(); // Reset button to START when input changes
+        });
+
+        controlButton.addEventListener('click', function() {
+            if (timeRemaining <= 0) {
+                return;
+            }
+
+            if (isPaused) {
+                // If paused, resume the timer
+                isPaused = false;
+                controlButton.innerText = 'PAUSE'; // Change button text to PAUSE
+            } else {
+                // Start the timer
+                if (!countdown) { // Start countdown only if it’s not already running
+                    controlButton.innerText = 'PAUSE'; // Change button text to PAUSE
+                    countdown = setInterval(() => {
+                        if (timeRemaining <= 0) {
+                            clearInterval(countdown);
+                            timerSound.play(); // Play sound when timer ends
+                            resetButton(); // Reset button and state when time is up
+                        } else if (!isPaused) {
+                            timeRemaining--;
+                            const minDisplay = Math.floor(timeRemaining / 60);
+                            const secDisplay = timeRemaining % 60;
+                            minutes.innerText = String(minDisplay).padStart(2, '0');
+                            seconds.innerText = String(secDisplay).padStart(2, '0');
+                        }
+                    }, 1000);
+                } else {
+                    // If already running, just toggle pause
+                    isPaused = true;
+                    controlButton.innerText = 'RESUME'; // Change button text to RESUME
+                }
+            }
+        });
+    </script>
+</body>
+</html>
