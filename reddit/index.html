@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <link rel="icon" href="icon.png" />
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="UTF-8" />
+    <title>ben.pet</title>
+    <style>
+      body {
+        background-color: #000000;
+        color: #ffffff;
+        font-family: "Inter", sans-serif;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        font-size: 15pt;
+      }
+      .title {
+        position: absolute;
+        top: 0.1em;
+        left: 0.8em;
+        font-size: 15pt;
+      }
+      .top-right {
+        position: absolute;
+        font-size: 15pt;
+        top: 0.8em;
+        right: 0.8em;
+      }
+      .links {
+        color: white;
+        text-decoration: none;
+        font-weight: 700;
+      }
+      .posts {
+        font-size: 15pt;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: calc(100% - 50pt);
+        padding-top: 15em;
+      }
+      .reddit-embed-bq {
+        max-width: 250px !important;
+        width: 100%;
+        align-self: center;
+      }
+      ::-webkit-scrollbar {
+        display: none;
+      }
+      .home:link {
+        text-decoration: none;
+      }
+      .home {
+        color: white;
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module">
+      import { updateSignInLinks } from "/dist/index.mjs";
+      document.addEventListener("DOMContentLoaded", updateSignInLinks);
+    </script>
+  </head>
+  <body>
+    <h1 class="title">
+      <a class="home" href="/">BEN.PET<sup>&copy;</sup></a>
+    </h1>
+    <a class="links top-right" href="/signin/">SIGN IN</a>
+    <div class="container">
+      <h1 class="posts">POSTS</h1>
+      <blockquote
+        class="reddit-embed-bq"
+        data-embed-showtitle="true"
+        data-embed-showmedia="false"
+        data-embed-height="345"
+      >
+        <a
+          href="https://www.reddit.com/r/CreditCards/comments/115zio7/recommendation_for_second_credit_card_as_a/j94nv9o/"
+          >Comment</a
+        ><br />
+        by <a href="https://www.reddit.com/user/820crew">u/820crew</a> from
+        discussion
+        <a
+          href="https://www.reddit.com/r/CreditCards/comments/115zio7/recommendation_for_second_credit_card_as_a/"
+          >Recommendation for Second Credit Card as a Commuting College
+          Student</a
+        ><br />
+        in <a href="https://www.reddit.com/r/CreditCards/">CreditCards</a>
+      </blockquote>
+      <script
+        async=""
+        src="https://embed.reddit.com/widgets.js"
+        charset="UTF-8"
+      ></script>
+    </div>
+  </body>
+</html>

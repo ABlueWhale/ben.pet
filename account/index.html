@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <link rel="icon" href="/icon.png" />
+  <head>
+    <script type="module" src="/dist/index.mjs"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="UTF-8" />
+    <title>ben.pet</title>
+    <style>
+      body {
+        background-color: #000000;
+        color: #ffffff;
+        font-family: "Inter", sans-serif;
+        font-size: 15pt;
+      }
+      .title {
+        position: absolute;
+        top: 0.1em;
+        left: 0.8em;
+        font-size: 15pt;
+      }
+      .top-right {
+        position: absolute;
+        font-size: 15pt;
+        top: 0.8em;
+        right: 0.8em;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: calc(100vh - 1em);
+      }
+      ::-webkit-scrollbar {
+        display: none;
+      }
+      ::selection {
+        background: white;
+        color: black;
+      }
+      .home:link {
+        text-decoration: none;
+      }
+      .home {
+        color: white;
+      }
+      .signout-btn {
+        background: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        font-size: 15pt;
+        font-weight: 700;
+      }
+      #publicKey {
+        font-family: "Platypi", sans-serif;
+      }
+      #privateKey {
+        cursor: pointer;
+        font-family: "Platypi", sans-serif;
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Metal&family=Platypi:ital,wght@0,300..800;1,300..800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <h1 class="title">
+      <a class="home" href="/">BEN.PET<sup>&copy;</sup></a>
+    </h1>
+    <button class="signout-btn top-right">SIGN OUT</button>
+    <div class="container">
+      <a>PUBLIC: <span id="publicKey"></span></a>
+      <a>PRIVATE: <span id="privateKey" class="truncated"></span></a>
+      <a>SAVE THIS PRIVATE KEY IN A SAFE PLACE</a>
+    </div>
+    <script type="module">
+      document.querySelector(".signout-btn").addEventListener("click", () => {
+        sessionStorage.removeItem("userKey");
+        window.location.href = "/";
+      });
+
+      const privateKeyElement = document.getElementById("privateKey");
+      if (privateKeyElement) {
+        const fullKey = privateKeyElement.textContent;
+        if (fullKey) {
+          const truncatedKey = fullKey.substring(0, 6) + "...";
+          privateKeyElement.textContent = truncatedKey;
+
+          privateKeyElement.addEventListener("click", function () {
+            const isExpanded = !this.classList.contains("truncated");
+            this.textContent = isExpanded ? truncatedKey : fullKey;
+            this.classList.toggle("truncated");
+          });
+        }
+      }
+    </script>
+  </body>
+</html>

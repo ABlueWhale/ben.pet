@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="icon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="UTF-8" />
+    <title>ben.pet</title>
+    <style>
+      body {
+        background-color: #000000;
+        color: #ffffff;
+        font-family: "Inter", sans-serif;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        font-size: 15pt;
+      }
+      .title {
+        position: absolute;
+        top: 0.1em;
+        left: 0.8em;
+        font-size: 15pt;
+      }
+      .top-right {
+        position: absolute;
+        font-size: 15pt;
+        top: 0.8em;
+        right: 0.8em;
+      }
+      .links {
+        color: white;
+        text-decoration: none;
+        font-weight: 700;
+      }
+      .controlButton {
+        font-size: 15pt;
+        cursor: pointer;
+      }
+      #minutes,
+      #seconds {
+        font-size: 50pt;
+      }
+      #minutes:focus,
+      #seconds:focus {
+        outline: none;
+        caret-color: transparent;
+        opacity: 50%;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: calc(100vh - 1em);
+      }
+      ::-webkit-scrollbar {
+        display: none;
+      }
+      ::selection {
+        background: transparent;
+      }
+      .home:link {
+        text-decoration: none;
+      }
+      .home {
+        color: white;
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module">
+      import { updateSignInLinks } from "/dist/index.mjs";
+      document.addEventListener("DOMContentLoaded", updateSignInLinks);
+    </script>
+  </head>
+  <body>
+    <h1 class="title">
+      <a class="home" href="/">BEN.PET<sup>&copy;</sup></a>
+    </h1>
+    <a class="links top-right" href="/signin/">SIGN IN</a>
+    <div class="container">
+      <h1 class="time">
+        <span id="minutes" contenteditable="true">25</span>
+        <!-- Set initial time to 25 mins -->
+        <span id="seconds" contenteditable="true">00</span>
+      </h1>
+      <h1 id="controlButton" class="controlButton">
+        <span id="startButton">START</span> |
+        <span id="pomodoroButton">POMODORO 1X</span>
+      </h1>
+    </div>
+    <script>
+      let countdown;
+      let timeRemaining = 1500; // Default to 25 minutes
+      let isPaused = false;
+      let pomodoroStatus = 1; // 25 minutes * pomodoroStatus (1X = 25 minutes, 2X = 50 minutes, 3X = 75 minutes)
+      const minutes = document.getElementById("minutes");
+      const seconds = document.getElementById("seconds");
+      const startButton = document.getElementById("startButton");
+      const pomodoroButton = document.getElementById("pomodoroButton");
+      const body = document.body;
+      const titleLink = document.querySelector(".home");
+
+      function updateTimeRemaining() {
+        const minInput = Math.min(Math.max(Number(minutes.innerText), 0), 99);
+        const secInput = Math.min(Math.max(Number(seconds.innerText), 0), 59);
+        timeRemaining = minInput * 60 + secInput;
+      }
+
+      function resetButton() {
+        startButton.innerText = "START";
+        clearInterval(countdown);
+        countdown = null;
+        isPaused = false;
+      }
+
+      function startTimer() {
+        if (timeRemaining <= 0) return;
+        if (isPaused) {
+          isPaused = false;
+          startButton.innerText = "PAUSE";
+        } else {
+          if (!countdown) {
+            startButton.innerText = "PAUSE";
+            countdown = setInterval(() => {
+              if (timeRemaining <= 0) {
+                clearInterval(countdown);
+                handleTimerEnd();
+              } else if (!isPaused) {
+                timeRemaining--;
+                const minDisplay = Math.floor(timeRemaining / 60);
+                const secDisplay = timeRemaining % 60;
+                minutes.innerText = String(minDisplay).padStart(2, "0");
+                seconds.innerText = String(secDisplay).padStart(2, "0");
+              }
+            }, 1000);
+          } else {
+            isPaused = true;
+            startButton.innerText = "RESUME";
+          }
+        }
+      }
+
+      function handleTimerEnd() {
+        flashScreen(() => {
+          let breakTime = pomodoroStatus * 300; // 5 minutes * pomodoroStatus (1X = 5 minutes, 2X = 10 minutes, 3X = 15 minutes)
+          timeRemaining = breakTime;
+          minutes.innerText = String(Math.floor(breakTime / 60)).padStart(
+            2,
+            "0"
+          );
+          seconds.innerText = String(breakTime % 60).padStart(2, "0");
+          startBreakTimer();
+        });
+      }
+
+      function flashScreen(callback) {
+        let flashCount = 0;
+        const flashInterval = setInterval(() => {
+          const isEven = flashCount % 2 === 0;
+          body.style.backgroundColor = isEven ? "#FFF" : "#000";
+          body.style.color = isEven ? "#000" : "#FFF";
+          titleLink.style.color = isEven ? "#000" : "#FFF";
+
+          flashCount++;
+          if (flashCount >= 6) {
+            // Flash 3 times (6 transitions)
+            clearInterval(flashInterval);
+            // Return to default colors (black background, white text)
+            body.style.backgroundColor = "#000";
+            body.style.color = "#FFF";
+            titleLink.style.color = "#FFF";
+            if (callback) callback();
+          }
+        }, 400); // Flash every 0.5 seconds, 6 times
+      }
+
+      function startBreakTimer() {
+        body.style.backgroundColor = "#FFF"; // Change to white during break
+        body.style.color = "#000";
+        titleLink.style.color = "#000";
+
+        startButton.innerText = "PAUSE";
+        countdown = setInterval(() => {
+          if (timeRemaining <= 0) {
+            clearInterval(countdown);
+            flashScreen(() => {
+              resetButton(); // Flash after break ends
+              startTaskTimer(); // Restart the same Pomodoro cycle after the break
+            });
+          } else if (!isPaused) {
+            timeRemaining--;
+            const minDisplay = Math.floor(timeRemaining / 60);
+            const secDisplay = timeRemaining % 60;
+            minutes.innerText = String(minDisplay).padStart(2, "0");
+            seconds.innerText = String(secDisplay).padStart(2, "0");
+          }
+        }, 1000);
+      }
+
+      function startTaskTimer() {
+        body.style.backgroundColor = "#000"; // Change to black during task
+        body.style.color = "#FFF";
+        titleLink.style.color = "#FFF";
+
+        // Calculate the task timer duration based on the current Pomodoro status
+        timeRemaining = pomodoroStatus * 1500; // 25 minutes * pomodoroStatus (1X = 25 minutes, 2X = 50 minutes, 3X = 75 minutes)
+        minutes.innerText = String(Math.floor(timeRemaining / 60)).padStart(
+          2,
+          "0"
+        );
+        seconds.innerText = String(timeRemaining % 60).padStart(2, "0");
+        startTimer(); // Start the timer again with the same duration
+      }
+
+      function cyclePomodoro() {
+        pomodoroStatus = (pomodoroStatus % 3) + 1; // Cycle through 1X, 2X, 3X
+        pomodoroButton.innerText = `POMODORO ${pomodoroStatus}X`;
+        // Update timeRemaining based on the new Pomodoro status immediately
+        startTaskTimer(); // Restart the timer immediately with new Pomodoro duration
+        resetButton(); // Reset the button after changing the status
+      }
+
+      minutes.addEventListener("input", () => {
+        minutes.innerText = minutes.innerText.replace(/\D/g, "00");
+        if (minutes.innerText.length > 2)
+          minutes.innerText = minutes.innerText.slice(0, 2);
+        else if (minutes.innerText === "") minutes.innerText = "00";
+        else if (minutes.innerText.length === 1)
+          minutes.innerText = "0" + minutes.innerText;
+        updateTimeRemaining();
+      });
+
+      seconds.addEventListener("input", () => {
+        seconds.innerText = seconds.innerText.replace(/\D/g, "00");
+        if (seconds.innerText.length > 2)
+          seconds.innerText = seconds.innerText.slice(0, 2);
+        else if (seconds.innerText === "") seconds.innerText = "00";
+        else if (seconds.innerText.length === 1)
+          seconds.innerText = "0" + seconds.innerText;
+        updateTimeRemaining();
+      });
+
+      startButton.addEventListener("click", startTimer);
+      pomodoroButton.addEventListener("click", cyclePomodoro);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <link rel="icon" href="/icon.png" />
+  <head>
+    <script type="module" src="/dist/index.mjs"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="UTF-8" />
+    <title>ben.pet</title>
+    <style>
+      body {
+        background-color: #000000;
+        color: #ffffff;
+        font-family: "Inter", sans-serif;
+        font-size: 15pt;
+      }
+      .title {
+        position: absolute;
+        font-size: 15pt;
+        top: 0.1em;
+        left: 0.8em;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: calc(100vh - 1em);
+      }
+      .input-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+      }
+      #key-input {
+        background: transparent;
+        border: none;
+        color: white;
+        font-family: "Inter", sans-serif;
+        font-size: 15pt;
+        width: auto;
+        padding: 0;
+      }
+      #key-input:focus {
+        outline: none;
+      }
+      #sign-in-button {
+        background: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        font-size: 15pt;
+        padding: 0;
+      }
+      #sign-in-button:hover {
+        opacity: 0.7;
+      }
+      .status-message {
+        margin-top: 1em;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .visible {
+        opacity: 100%;
+      }
+      .home {
+        color: white;
+        text-decoration: none;
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module">
+      import { handleSignIn } from "/dist/index.mjs";
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const input = document.getElementById("key-input");
+        const status = document.getElementById("status");
+        const signInButton = document.getElementById("sign-in-button");
+
+        async function attemptSignIn() {
+          if (input.value.trim()) {
+            status.textContent = "Checking key...";
+            status.classList.add("visible");
+
+            const success = await handleSignIn(input.value.trim());
+
+            if (success) {
+              status.textContent = "Key valid! Redirecting...";
+              setTimeout(() => {
+                window.location.href = "/todo/";
+              }, 1000);
+            } else {
+              status.textContent = "Invalid key";
+              input.value = "";
+              setTimeout(() => {
+                status.classList.remove("visible");
+              }, 2000);
+            }
+          }
+        }
+
+        input.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") {
+            attemptSignIn();
+          }
+        });
+
+        signInButton.addEventListener("click", attemptSignIn);
+      });
+    </script>
+  </head>
+  <body>
+    <h1 class="title">
+      <a class="home" href="/">BEN.PET<sup>&copy;</sup></a>
+    </h1>
+    <div class="container">
+      <div class="input-container">
+        <input type="text" id="key-input" placeholder="ENTER KEY" />
+        <button id="sign-in-button">→</button>
+      </div>
+      <div id="status"></div>
+    </div>
+  </body>
+</html>

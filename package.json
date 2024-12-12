@@ -1,0 +1,20 @@
+{
+  "name": "ben.pet",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "exports": "./dist/index.mjs",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx pkgroll --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "http-server": "^14.1.1"
+  },
+  "devDependencies": {
+    "firebase": "^11.0.2"
+  }
+}
