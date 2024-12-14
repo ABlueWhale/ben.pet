@@ -109,9 +109,17 @@ export const handleSignIn = async (privateKey: string): Promise<boolean> => {
 
 // Add these new exports for todo functionality
 export const saveTodoTasks = async (
-  tasks: { text: string; completed: boolean }[],
-  privateKey: string
+  tasks: { text: string; completed: boolean }[]
 ) => {
+  const privateKey = sessionStorage.getItem("userKey");
+
+  if (!privateKey) {
+    // For unauthenticated users, save to localStorage instead
+    localStorage.setItem("localTodoTasks", JSON.stringify(tasks));
+    return true;
+  }
+
+  // For authenticated users, save to Firestore
   try {
     const docRef = doc(db, "users", privateKey);
     await setDoc(docRef, { tasks }, { merge: true });
@@ -122,7 +130,16 @@ export const saveTodoTasks = async (
   }
 };
 
-export const loadTodoTasks = async (privateKey: string) => {
+export const loadTodoTasks = async () => {
+  const privateKey = sessionStorage.getItem("userKey");
+
+  if (!privateKey) {
+    // For unauthenticated users, load from localStorage
+    const localTasks = localStorage.getItem("localTodoTasks");
+    return localTasks ? JSON.parse(localTasks) : [];
+  }
+
+  // For authenticated users, load from Firestore
   try {
     const docRef = doc(db, "users", privateKey);
     const docSnap = await getDoc(docRef);
@@ -140,8 +157,10 @@ export const loadTodoTasks = async (privateKey: string) => {
 export const updateSignInLinks = () => {
   const userKey = sessionStorage.getItem("userKey");
   const signInLinks = document.querySelectorAll('a[href="/signin/"]');
+  const todoLinks = document.querySelectorAll('a[href="/todo/"]');
   const registerLink = document.querySelector(".register-link");
 
+  // Update sign in links
   signInLinks.forEach((link) => {
     if (userKey) {
       link.textContent = "ACCOUNT";
@@ -150,6 +169,11 @@ export const updateSignInLinks = () => {
       link.textContent = "SIGN IN";
       link.href = "/signin/";
     }
+  });
+
+  // Ensure todo links always point to /todo/
+  todoLinks.forEach((link) => {
+    link.href = "/todo/";
   });
 
   // Hide register link if user is logged in

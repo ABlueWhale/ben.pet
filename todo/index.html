@@ -33,16 +33,13 @@
         padding: 0.5em;
         font-family: "Inter", sans-serif;
         font-size: 15pt;
-        width: 300px;
+        width: 400px;
         display: none;
         outline: none;
-        caret-color: transparent;
         opacity: 100%;
       }
       #todo-input:focus {
         outline: none;
-        caret-color: transparent;
-        opacity: 50%;
       }
       #add-button {
         background: transparent;
@@ -62,7 +59,6 @@
         font-size: 24pt;
         padding: 0;
         transform: rotate(45deg);
-        width: 24pt;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -76,10 +72,13 @@
         cursor: pointer;
         flex-grow: 1;
         margin-right: 1em;
+        word-wrap: break-word;
+        word-break: break-word;
+        min-width: min-content;
+        width: 360px;
       }
       .todo-item span:focus {
         outline: none;
-        opacity: 50%;
       }
       .home {
         color: white;
@@ -89,7 +88,8 @@
         list-style-type: none;
         padding: 0;
         margin: 0;
-        width: 300px;
+        width: 400px;
+        min-width: min-content;
       }
       .todo-item {
         display: flex;
@@ -111,19 +111,20 @@
         const addButton = document.getElementById("add-button");
         let userPrivateKey = sessionStorage.getItem("userKey");
 
-        if (!userPrivateKey) {
-          window.location.href = "/signin/";
-          return;
-        }
-
         async function loadTasks() {
-          const tasks = await loadTodoTasks(userPrivateKey);
-          tasks.forEach((task) => {
-            createTaskElement(task.text, task.completed);
-          });
+          if (userPrivateKey) {
+            const tasks = await loadTodoTasks(userPrivateKey);
+            tasks.forEach((task) => {
+              createTaskElement(task.text, task.completed);
+            });
+          }
         }
 
         async function saveTasks() {
+          if (!userPrivateKey) {
+            console.log("No userPrivateKey found. Tasks won't be saved.");
+            return;
+          }
           const tasks = Array.from(list.children).map((li) => ({
             text: li.querySelector("span").textContent,
             completed: li.querySelector("span").classList.contains("completed"),
@@ -141,7 +142,6 @@
 
           if (completed) {
             textSpan.classList.add("completed");
-            deleteBtn.style.transform = "rotate(0deg)"; // Reset rotation when completed
           }
 
           textSpan.addEventListener("keypress", (e) => {
@@ -160,7 +160,6 @@
 
           textSpan.addEventListener("focus", () => {
             textSpan.classList.remove("completed");
-            deleteBtn.style.transform = "rotate(45deg)"; // Rotate back to X when editing
             saveTasks();
           });
 
@@ -200,6 +199,12 @@
             list.after(addButton);
             saveTasks();
           }
+        });
+
+        input.addEventListener("blur", () => {
+          input.style.display = "none";
+          addButton.style.display = "flex";
+          list.after(addButton);
         });
 
         // Load tasks when page loads
