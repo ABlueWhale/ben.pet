@@ -33,11 +33,12 @@
       }
       #key-input {
         background: transparent;
+        caret-color: white;
         border: none;
         color: white;
         font-family: "Inter", sans-serif;
         font-size: 15pt;
-        width: auto;
+        width: calc(auto + 1em);
         padding: 0;
       }
       #key-input:focus {
@@ -48,29 +49,44 @@
         border: none;
         color: white;
         cursor: pointer;
-        font-family: "Inter", sans-serif;
-        font-size: 15pt;
+        font-family: "Material Symbols Outlined", sans-serif;
+        font-size: 24pt;
         padding: 0;
-      }
-      #sign-in-button:hover {
-        opacity: 0.7;
-      }
-      .status-message {
-        margin-top: 1em;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-      .visible {
-        opacity: 100%;
       }
       .home {
         color: white;
         text-decoration: none;
       }
+      #key-input:-webkit-autofill,
+      #key-input:-webkit-autofill:hover,
+      #key-input:-webkit-autofill:focus,
+      #key-input:-webkit-autofill:active {
+        -webkit-text-fill-color: white;
+        -webkit-box-shadow: 0 0 0px 1000px #000 inset;
+        transition: background-color 0.1s ease-in-out 0s;
+        font-family: "Platypi", sans-serif !important;
+        font-size: 15pt !important;
+      }
+      #status {
+        margin-top: 1em;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      #status.visible {
+        opacity: 100%;
+      }
     </style>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap"
       rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Metal&family=Platypi:ital,wght@0,300..800;1,300..800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_right_alt"
     />
     <script type="module">
       import { handleSignIn } from "/dist/index.mjs";
@@ -118,7 +134,13 @@
     </h1>
     <div class="container">
       <div class="input-container">
-        <input type="text" id="key-input" placeholder="ENTER KEY" />
+        <input
+          type="text"
+          id="key-input"
+          placeholder="ENTER KEY"
+          spellcheck="false"
+          autocorrect="off"
+        />
         <button id="sign-in-button">→</button>
       </div>
       <div id="status"></div>
