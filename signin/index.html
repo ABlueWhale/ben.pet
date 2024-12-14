@@ -103,18 +103,20 @@
 
         async function attemptSignIn() {
           if (input.value.trim()) {
-            status.textContent = "Checking key...";
+            status.textContent = "VERIFYING KEY...";
             status.classList.add("visible");
 
             const success = await handleSignIn(input.value.trim());
 
             if (success) {
-              status.textContent = "Key valid! Redirecting...";
+              setTimeout(() => {
+                status.textContent = "KEY VERIFIED";
+              }, 500);
               setTimeout(() => {
                 window.location.href = "/todo/";
               }, 1000);
             } else {
-              status.textContent = "Invalid key";
+              status.textContent = "INVALID KEY";
               input.value = "";
               setTimeout(() => {
                 status.classList.remove("visible");
@@ -145,10 +147,11 @@
           placeholder="ENTER KEY"
           spellcheck="false"
           autocorrect="off"
+          autocomplete="off"
         />
         <button id="sign-in-button">→</button>
-        <a id="status" class="status"></a>
       </div>
+      <a id="status" class="status"></a>
     </div>
   </body>
 </html>

@@ -18325,14 +18325,14 @@ function displayKeys() {
           try {
             await navigator.clipboard.writeText(privateKey);
             if (statusElement) {
-              statusElement.textContent = "Key copied to clipboard";
+              statusElement.textContent = "COPIED KEY";
               statusElement.classList.add("visible");
               setTimeout(() => {
                 statusElement.classList.remove("visible");
               }, 2e3);
             }
           } catch (err) {
-            console.error("Failed to copy to clipboard:", err);
+            console.error("FAILED TO COPY KEY", err);
           }
         }
       });
