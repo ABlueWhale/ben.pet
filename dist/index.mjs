@@ -18311,13 +18311,39 @@ function displayKeys() {
     const privateKey = sessionStorage.getItem("userKey");
     const publicKeyElement = document.getElementById("publicKey");
     const privateKeyElement = document.getElementById("privateKey");
+    const statusElement = document.getElementById("status");
     if (privateKey && publicKeyElement && privateKeyElement) {
+      const truncatedKey = privateKey.substring(0, 6) + "...";
       publicKeyElement.textContent = privateKey.substring(0, 6);
-      privateKeyElement.textContent = privateKey;
+      privateKeyElement.textContent = truncatedKey;
+      privateKeyElement.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        privateKeyElement.textContent = privateKeyElement.textContent.includes(
+          "..."
+        ) ? privateKey : truncatedKey;
+        if (!privateKeyElement.textContent.includes("...")) {
+          try {
+            await navigator.clipboard.writeText(privateKey);
+            if (statusElement) {
+              statusElement.textContent = "Key copied to clipboard";
+              statusElement.classList.add("visible");
+              setTimeout(() => {
+                statusElement.classList.remove("visible");
+              }, 2e3);
+            }
+          } catch (err) {
+            console.error("Failed to copy to clipboard:", err);
+          }
+        }
+      });
+      document.addEventListener("click", () => {
+        privateKeyElement.textContent = truncatedKey;
+      });
     }
   }
 }
 window.addEventListener("load", displayKeys);
+window.displayKeys = displayKeys;
 window.handleSignUp = handleSignUp;
 const handleSignIn = async (privateKey) => {
   try {
@@ -18333,22 +18359,26 @@ const handleSignIn = async (privateKey) => {
     return false;
   }
 };
-const saveTodoTasks = async (tasks, privateKey) => {
+const saveTodoTasks = async (tasks) => {
+  const privateKey = sessionStorage.getItem("userKey");
   if (!privateKey) {
-    console.log("No key provided - changes won't be saved");
-    return;
+    localStorage.setItem("localTodoTasks", JSON.stringify(tasks));
+    return true;
   }
   try {
     const docRef = doc(db, "users", privateKey);
     await setDoc(docRef, { tasks }, { merge: true });
+    return true;
   } catch (error) {
     console.error("Error saving tasks:", error);
+    return false;
   }
 };
-const loadTodoTasks = async (privateKey) => {
+const loadTodoTasks = async () => {
+  const privateKey = sessionStorage.getItem("userKey");
   if (!privateKey) {
-    console.log("No key provided - starting with empty list");
-    return [];
+    const localTasks = localStorage.getItem("localTodoTasks");
+    return localTasks ? JSON.parse(localTasks) : [];
   }
   try {
     const docRef = doc(db, "users", privateKey);
@@ -18365,6 +18395,7 @@ const loadTodoTasks = async (privateKey) => {
 const updateSignInLinks = () => {
   const userKey = sessionStorage.getItem("userKey");
   const signInLinks = document.querySelectorAll('a[href="/signin/"]');
+  const todoLinks = document.querySelectorAll('a[href="/todo/"]');
   const registerLink = document.querySelector(".register-link");
   signInLinks.forEach((link) => {
     if (userKey) {
@@ -18375,9 +18406,12 @@ const updateSignInLinks = () => {
       link.href = "/signin/";
     }
   });
+  todoLinks.forEach((link) => {
+    link.href = "/todo/";
+  });
   if (registerLink) {
     registerLink.style.display = userKey ? "none" : "block";
   }
 };
 
-export { handleSignIn, handleSignUp, loadTodoTasks, saveTodoTasks, updateSignInLinks };
+export { displayKeys, handleSignIn, handleSignUp, loadTodoTasks, saveTodoTasks, updateSignInLinks };

@@ -59,6 +59,21 @@
       }
       #privateKey {
         font-family: "Platypi", sans-serif;
+        display: inline-flex;
+        cursor: pointer;
+      }
+      .status {
+        position: fixed;
+        top: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: all 1s ease;
+        z-index: 1000;
+      }
+      .status.visible {
+        top: 0.8em;
+        opacity: 100%;
       }
     </style>
     <link
@@ -77,29 +92,15 @@
     <button class="signout-btn top-right">SIGN OUT</button>
     <div class="container">
       <a>PUBLIC: <span id="publicKey"></span></a>
-      <a>PRIVATE: <span id="privateKey" class="truncated"></span></a>
+      <a>PRIVATE: <span id="privateKey"></span></a>
       <a>SAVE THIS PRIVATE KEY IN A SAFE PLACE</a>
+      <a id="status" class="status"></a>
     </div>
     <script type="module">
       document.querySelector(".signout-btn").addEventListener("click", () => {
         sessionStorage.removeItem("userKey");
         window.location.href = "/";
       });
-
-      const privateKeyElement = document.getElementById("privateKey");
-      if (privateKeyElement) {
-        const fullKey = privateKeyElement.textContent;
-        if (fullKey) {
-          const truncatedKey = fullKey.substring(0, 6) + "...";
-          privateKeyElement.textContent = truncatedKey;
-
-          privateKeyElement.addEventListener("click", function () {
-            const isExpanded = !this.classList.contains("truncated");
-            this.textContent = isExpanded ? truncatedKey : fullKey;
-            this.classList.toggle("truncated");
-          });
-        }
-      }
     </script>
   </body>
 </html>

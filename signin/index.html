@@ -67,12 +67,17 @@
         font-family: "Platypi", sans-serif !important;
         font-size: 15pt !important;
       }
-      #status {
-        margin-top: 1em;
+      .status {
+        position: fixed;
+        top: -50px;
+        left: 50%;
+        transform: translateX(-50%);
         opacity: 0;
-        transition: opacity 0.3s ease;
+        transition: all 1s ease;
+        z-index: 1000;
       }
-      #status.visible {
+      .status.visible {
+        top: 0.8em;
         opacity: 100%;
       }
     </style>
@@ -142,8 +147,8 @@
           autocorrect="off"
         />
         <button id="sign-in-button">→</button>
+        <a id="status" class="status"></a>
       </div>
-      <div id="status"></div>
     </div>
   </body>
 </html>

@@ -66,21 +66,62 @@ export const handleSignUp = async () => {
 };
 
 // Add a function to handle displaying keys on the account page
-function displayKeys() {
+export function displayKeys() {
   if (window.location.pathname.includes("/account/")) {
     const privateKey = sessionStorage.getItem("userKey");
     const publicKeyElement = document.getElementById("publicKey");
     const privateKeyElement = document.getElementById("privateKey");
+    const statusElement = document.getElementById("status");
 
     if (privateKey && publicKeyElement && privateKeyElement) {
+      const truncatedKey = privateKey.substring(0, 6) + "...";
       publicKeyElement.textContent = privateKey.substring(0, 6);
-      privateKeyElement.textContent = privateKey;
+      privateKeyElement.textContent = truncatedKey;
+
+      // Add click handler for privateKey element
+      privateKeyElement.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        privateKeyElement.textContent = privateKeyElement.textContent.includes(
+          "..."
+        )
+          ? privateKey
+          : truncatedKey;
+
+        // Copy to clipboard when expanded
+        if (!privateKeyElement.textContent.includes("...")) {
+          try {
+            await navigator.clipboard.writeText(privateKey);
+            if (statusElement) {
+              statusElement.textContent = "Key copied to clipboard";
+              statusElement.classList.add("visible");
+              setTimeout(() => {
+                statusElement.classList.remove("visible");
+              }, 2000);
+            }
+          } catch (err) {
+            console.error("Failed to copy to clipboard:", err);
+          }
+        }
+      });
+
+      // Add document click handler to collapse
+      document.addEventListener("click", () => {
+        privateKeyElement.textContent = truncatedKey;
+      });
     }
   }
 }
 
-// Call displayKeys when the page loads
+// Make sure displayKeys is called when the page loads
 window.addEventListener("load", displayKeys);
+
+// Make displayKeys available on the window object
+declare global {
+  interface Window {
+    displayKeys: () => void;
+  }
+}
+window.displayKeys = displayKeys;
 
 // Make handleSignUp available on the window object
 declare global {
